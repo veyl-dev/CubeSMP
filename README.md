@@ -26,11 +26,11 @@ CubeSMP is a Minecraft server storefront and management platform with a Next.js 
 5. Install dependencies from the repository root: `pnpm install`.
 6. Generate Prisma Client: `pnpm --filter @cubesmp/web db:generate`.
 7. Apply the schema in development: `pnpm --filter @cubesmp/web db:migrate`.
-8. Seed the initial disabled catalog: `pnpm --filter @cubesmp/web db:seed`.
+8. Seed the editable catalog: `pnpm --filter @cubesmp/web db:seed`.
 9. Create the first Owner using the one-time bootstrap variables and command described in [deployment](docs/DEPLOYMENT.md).
 10. Start the website: `pnpm dev`.
 
-The seeded VIP, MVP, ELITE and 1,000 / 3,000 / 5,000 / 10,000 point packages are disabled and have no price until the Owner configures them. This avoids publishing accidental free products or inventing prices.
+The starter catalog includes VIP, MVP, ELITE and 1,000 / 3,000 / 5,000 / 10,000 point packages with sample PHP prices. Change them in Admin → Store before launch. GCash and Maya stay disabled until configured by the Owner.
 
 ## Build the Bridge plugin
 
@@ -40,4 +40,4 @@ See [deployment](docs/DEPLOYMENT.md), [operations](docs/OPERATIONS.md), and [arc
 
 ## Current status
 
-This is an active implementation branch, not yet a production-ready release. The remaining production controls and known delivery semantics are documented in [operations](docs/OPERATIONS.md). Do not use it for real payments until CI passes, a real PostgreSQL/S3 deployment is configured, and the full purchase-to-delivery flow is tested on a staging server.
+This is an active implementation branch, not yet a production-ready release. The remaining production controls and known delivery semantics are documented in [operations](docs/OPERATIONS.md). Do not use it for real payments until CI passes, the Supabase runtime secrets are configured, and the full purchase-to-delivery flow is tested on a staging server.
