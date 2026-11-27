@@ -11,10 +11,10 @@ export default function CheckoutForm({productId,priceMinor,methods}:{productId:s
    if(!(file instanceof File)||!file.size)throw new Error("Upload your payment screenshot.");
    if(file.size>5*1024*1024||!["image/jpeg","image/png","image/webp"].includes(file.type))throw new Error("Use a JPG, PNG, or WebP image up to 5 MB.");
    if(!method)throw new Error("Choose GCash or Maya.");
-   const signed=await fetch("/api/uploads/payment-proof",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contentType:file.type,size:file.size})}).then(r=>r.json());
-   if(!signed.uploadUrl)throw new Error(signed.error??"Could not prepare proof upload.");
-   const uploaded=await fetch(signed.uploadUrl,{method:"PUT",headers:{"Content-Type":file.type},body:file});
-   if(!uploaded.ok)throw new Error("Payment proof upload failed. Check storage CORS settings.");
+   const proofForm=new FormData();proofForm.append("proof",file);
+   const proofResponse=await fetch("/api/uploads/payment-proof",{method:"POST",body:proofForm});
+   const signed=await proofResponse.json();
+   if(!proofResponse.ok||!signed.key)throw new Error(signed.error??"Payment proof upload failed.");
    const result=await fetch("/api/orders",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({productId,method,referenceNumber:form.get("referenceNumber"),amountMinor:priceMinor,proofObjectKey:signed.key})}).then(async r=>({ok:r.ok,data:await r.json()}));
    if(!result.ok)throw new Error(result.data.error??"Could not submit order.");
    setDone(result.data.orderId);
