@@ -8,6 +8,7 @@ const schema=z.object({
  name:z.string().min(2).max(80).optional(),
  slug:z.string().regex(/^[a-z0-9-]+$/).max(100).optional(),
  description:z.string().max(2000).optional(),
+ imageUrl:z.string().startsWith("product-images/").nullable().optional(),
  priceMinor:z.number().int().nonnegative().optional(),
  type:z.enum(["RANK","POINTS","ITEM"]).optional(),
  pointsAmount:z.number().int().positive().nullable().optional(),
