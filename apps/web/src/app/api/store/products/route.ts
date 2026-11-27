@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { createDownloadUrl } from "@/lib/storage";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -9,5 +10,6 @@ export async function GET(request: Request) {
     orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
     select: { id: true, name: true, slug: true, description: true, imageUrl: true, priceMinor: true, currency: true, type: true, pointsAmount: true, rankKey: true, benefits: true }
   });
-  return NextResponse.json({ products });
+  const result=await Promise.all(products.map(async p=>({...p,imageUrl:p.imageUrl?await createDownloadUrl(p.imageUrl).catch(()=>null):null})));
+  return NextResponse.json({ products:result });
 }
