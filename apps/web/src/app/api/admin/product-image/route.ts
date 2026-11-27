@@ -16,5 +16,5 @@ export async function POST(request:Request){
   const key=`product-images/${randomUUID()}.${ext}`;
   await uploadPrivateObject(key,bytes,type);
   return NextResponse.json({key},{status:201});
- }catch{return NextResponse.json({error:"Could not upload product image. Check private storage configuration."},{status:503});}
+ }catch{return NextResponse.json({error:"Could not upload product image. Check Supabase Storage configuration."},{status:503});}
 }
