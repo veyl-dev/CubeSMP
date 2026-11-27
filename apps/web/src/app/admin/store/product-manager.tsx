@@ -2,8 +2,8 @@
 import { FormEvent,useState } from "react";
 type Category={id:string;name:string;slug:string};
 type Product={id:string;name:string;slug:string;description:string;imageUrl:string|null;priceMinor:number;type:"RANK"|"POINTS"|"ITEM";pointsAmount:number|null;rankKey:string|null;categoryId:string|null;enabled:boolean;deliveryCommands:string[];benefits:string[]};
-export default function ProductManager({initial}:{initial:Product[]}){
- const [items,setItems]=useState(initial);const [message,setMessage]=useState("");
+export default function ProductManager({initial,categories:initialCategories}:{initial:Product[];categories:Category[]}){
+ const [items,setItems]=useState(initial);const [categories,setCategories]=useState(initialCategories);const [message,setMessage]=useState("");
  async function create(e:FormEvent<HTMLFormElement>){
   e.preventDefault();const f=new FormData(e.currentTarget);
   const payload={name:f.get("name"),slug:f.get("slug"),description:f.get("description"),priceMinor:Math.round(Number(f.get("price"))*100),type:f.get("type"),categoryId:f.get("categoryId")||undefined,pointsAmount:f.get("points")?Number(f.get("points")):undefined,rankKey:f.get("rankKey")||undefined,deliveryCommands:String(f.get("commands")||"").split("\n").map(x=>x.trim()).filter(Boolean),benefits:String(f.get("benefits")||"").split("\n").map(x=>x.trim()).filter(Boolean),enabled:false};
