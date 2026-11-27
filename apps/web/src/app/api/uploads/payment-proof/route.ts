@@ -22,5 +22,5 @@ export async function POST(request:Request){
   const key=`payment-proofs/${user.id}/${randomUUID()}.${ext}`;
   await uploadPrivateObject(key,bytes,contentType);
   return NextResponse.json({key},{status:201});
- }catch{return NextResponse.json({error:"Unable to store payment proof. Check private S3 configuration."},{status:503});}
+ }catch{return NextResponse.json({error:"Unable to store payment proof. Check Supabase Storage configuration."},{status:503});}
 }
