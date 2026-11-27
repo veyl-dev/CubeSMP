@@ -18,17 +18,30 @@ REVOKE ALL ON TABLE "User","Session","ProductCategory","Product","Order","OrderI
 "PaymentTransaction","PointLedger","DeliveryJob","DeliveryLog","WebsiteSetting",
 "Announcement","PaymentMethodSetting","AuditLog" FROM anon, authenticated;
 
-INSERT INTO storage.buckets (id,name,public,file_size_limit,allowed_mime_types)
-VALUES
- ('product-images','product-images',true,5242880,ARRAY['image/jpeg','image/png','image/webp']),
- ('site-assets','site-assets',true,5242880,ARRAY['image/jpeg','image/png','image/webp','image/svg+xml']),
- ('payment-proofs','payment-proofs',false,5242880,ARRAY['image/jpeg','image/png','image/webp'])
-ON CONFLICT (id) DO UPDATE SET
- public=EXCLUDED.public,
- file_size_limit=EXCLUDED.file_size_limit,
- allowed_mime_types=EXCLUDED.allowed_mime_types;
+-- Storage is provided by Supabase. Skip this block on the plain PostgreSQL service used by CI.
+DO $storage$
+BEGIN
+  IF to_regclass('storage.buckets') IS NOT NULL THEN
+    EXECUTE $bucket$
+      INSERT INTO storage.buckets (id,name,public,file_size_limit,allowed_mime_types)
+      VALUES
+       ('product-images','product-images',true,5242880,ARRAY['image/jpeg','image/png','image/webp']),
+       ('site-assets','site-assets',true,5242880,ARRAY['image/jpeg','image/png','image/webp','image/svg+xml']),
+       ('payment-proofs','payment-proofs',false,5242880,ARRAY['image/jpeg','image/png','image/webp'])
+      ON CONFLICT (id) DO UPDATE SET
+       public=EXCLUDED.public,
+       file_size_limit=EXCLUDED.file_size_limit,
+       allowed_mime_types=EXCLUDED.allowed_mime_types
+    $bucket$;
+  END IF;
 
-CREATE POLICY "Public can read product images" ON storage.objects
-FOR SELECT TO anon, authenticated USING (bucket_id = 'product-images');
-CREATE POLICY "Public can read site assets" ON storage.objects
-FOR SELECT TO anon, authenticated USING (bucket_id = 'site-assets');
+  IF to_regclass('storage.objects') IS NOT NULL THEN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='Public can read product images') THEN
+      EXECUTE 'CREATE POLICY "Public can read product images" ON storage.objects FOR SELECT TO anon, authenticated USING (bucket_id = ''product-images'')';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='Public can read site assets') THEN
+      EXECUTE 'CREATE POLICY "Public can read site assets" ON storage.objects FOR SELECT TO anon, authenticated USING (bucket_id = ''site-assets'')';
+    END IF;
+  END IF;
+END
+$storage$;
