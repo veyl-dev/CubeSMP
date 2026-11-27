@@ -33,6 +33,7 @@ export async function POST(request:Request) {
     return NextResponse.json({orderId:order.id,status:"PENDING"},{status:201});
   } catch(error) {
     if(error instanceof z.ZodError) return NextResponse.json({error:"Invalid checkout details"},{status:400});
+    if(typeof error==="object"&&error!==null&&"code" in error&&error.code==="P2002")return NextResponse.json({error:"This payment reference has already been submitted"},{status:409});
     return NextResponse.json({error:"Unable to submit payment"},{status:500});
   }
 }
