@@ -1,0 +1,52 @@
+name: CubeSMP CI
+on:
+  push:
+    branches: [main, "feat/**"]
+  pull_request:
+    branches: [main]
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: cubesmp
+          POSTGRES_PASSWORD: cubesmp_local_only
+          POSTGRES_DB: cubesmp
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U cubesmp -d cubesmp"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://cubesmp:cubesmp_local_only@localhost:5432/cubesmp?schema=public
+      DIRECT_URL: postgresql://cubesmp:cubesmp_local_only@localhost:5432/cubesmp?schema=public
+      SESSION_SECRET: test-only-session-secret-change-this-before-production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm --filter @cubesmp/web exec prisma validate
+      - run: pnpm --filter @cubesmp/web db:generate
+      - run: pnpm --filter @cubesmp/web db:deploy
+      - run: pnpm --filter @cubesmp/web db:seed
+      - run: pnpm --filter @cubesmp/web typecheck
+      - run: pnpm --filter @cubesmp/web build
+  bridge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - run: mvn -B -f apps/bridge/pom.xml package

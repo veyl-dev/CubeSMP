@@ -1,0 +1,14 @@
+name: CubeSMPBridge
+version: 1.0.0
+main: dev.cubesmp.bridge.CubeSMPBridge
+api-version: '1.21'
+author: CubeSMP
+description: Connects the CubeSMP store to your Paper server.
+commands:
+  cubesmpbridge:
+    description: Reload CubeSMP Bridge configuration
+    usage: /cubesmpbridge reload
+    permission: cubesmpbridge.admin
+permissions:
+  cubesmpbridge.admin:
+    default: op
