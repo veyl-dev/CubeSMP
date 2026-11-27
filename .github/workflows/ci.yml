@@ -23,6 +23,7 @@ jobs:
           --health-retries 10
     env:
       DATABASE_URL: postgresql://cubesmp:cubesmp_local_only@localhost:5432/cubesmp?schema=public
+      DIRECT_URL: postgresql://cubesmp:cubesmp_local_only@localhost:5432/cubesmp?schema=public
       SESSION_SECRET: test-only-session-secret-change-this-before-production
     steps:
       - uses: actions/checkout@v4
