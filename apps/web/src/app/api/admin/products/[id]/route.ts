@@ -13,6 +13,7 @@ const schema=z.object({
  type:z.enum(["RANK","POINTS","ITEM"]).optional(),
  pointsAmount:z.number().int().positive().nullable().optional(),
  rankKey:z.string().max(40).nullable().optional(),
+ categoryId:z.string().nullable().optional(),
  enabled:z.boolean().optional(),
  featured:z.boolean().optional(),
  benefits:z.array(z.string().max(200)).max(30).nullable().optional(),
