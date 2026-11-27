@@ -2,7 +2,7 @@
 
 ## 1. Provision services
 
-Provision a PostgreSQL database and a private S3-compatible bucket. The bucket must not allow public reads. Configure HTTPS for the web application and allow the web server to reach the storage endpoint.
+Use the existing CubeSMP Supabase project for PostgreSQL and Storage. The `payment-proofs` bucket is private; `product-images` and `site-assets` are public read-only assets. Configure HTTPS for the web application.
 
 ## 2. Configure environment
 
@@ -29,7 +29,7 @@ pnpm --filter @cubesmp/web db:deploy
 pnpm --filter @cubesmp/web db:seed
 ```
 
-For production, generate and review a Prisma migration in a development environment, commit it, and run `prisma migrate deploy` during release.
+The CubeSMP Supabase database has already been provisioned. On its first deployment only, baseline Prisma's migration history without rerunning the initial SQL:\n\n```bash\npnpm --filter @cubesmp/web exec prisma migrate resolve --applied 20261127000000_init\npnpm --filter @cubesmp/web exec prisma migrate resolve --applied 20261127150000_supabase_storage_security\npnpm --filter @cubesmp/web exec prisma migrate resolve --applied 20261127160000_supabase_index_and_function_hardening\n```\n\nAfter the baseline, use `pnpm --filter @cubesmp/web db:deploy` for future committed migrations.
 
 ## 4. Create the first Owner
 
@@ -49,7 +49,7 @@ Open Payment settings to configure GCash and Maya account names, numbers, instru
 
 ## 6. Deploy the website
 
-Build with `pnpm build` and run with `pnpm --filter @cubesmp/web start`. Configure your platform to expose the Next.js server over HTTPS. Keep the S3 bucket private and configure backups for PostgreSQL and uploaded proof objects.
+Build with `pnpm build` and run with `pnpm --filter @cubesmp/web start`. Configure your platform to expose the Next.js server over HTTPS. Keep the `payment-proofs` bucket private and configure Supabase database backups and Storage retention for uploaded proof objects.
 
 ## 7. Install CubeSMP Bridge
 
