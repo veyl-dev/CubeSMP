@@ -29,7 +29,7 @@ The Bridge executes configured console commands on the Paper main thread and per
 ## Current implementation boundaries
 
 - Rate limiting is expected at the reverse proxy/hosting edge; the app does not yet include a distributed rate-limit store.
-- Category management, announcement editing/deletion, logo upload, navigation/social-link editing, and full theme/color controls remain to be completed. Product images, transaction search/filtering, basic player management, announcement creation, and homepage/support content settings are implemented.
+- Logo upload, navigation/social-link editing, full theme/color controls, and richer announcement scheduling remain to be completed. Product images, category management, transaction search/filtering, player management, announcement create/edit/publish/delete, and homepage/support content settings are implemented.
 - The Bridge currently polls and executes product delivery commands; configurable built-in LuckPerms/PlayerPoints adapters, persistent plugin-side receipt storage, and a lease-recovery admin workflow remain to be completed.
 - Email notifications and automated receipts are not yet wired.
 - Do not use this deployment for real payments until CI, security review, and full staging verification pass.
