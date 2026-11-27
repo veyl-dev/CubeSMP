@@ -7,11 +7,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole { OWNER ADMIN MODERATOR PLAYER }
-enum PaymentMethod { GCASH MAYA }
-enum TransactionStatus { PENDING APPROVED REJECTED DELIVERED }
-enum DeliveryStatus { QUEUED CLAIMED SUCCEEDED FAILED }
-enum ProductType { RANK POINTS ITEM }
+enum UserRole {
+  OWNER
+  ADMIN
+  MODERATOR
+  PLAYER
+}
+
+enum PaymentMethod {
+  GCASH
+  MAYA
+}
+
+enum TransactionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  DELIVERED
+}
+
+enum DeliveryStatus {
+  QUEUED
+  CLAIMED
+  SUCCEEDED
+  FAILED
+}
+
+enum ProductType {
+  RANK
+  POINTS
+  ITEM
+}
 
 model User {
   id              String   @id @default(cuid())
