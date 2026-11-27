@@ -3,7 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireRoles } from "@/lib/authz";
 
-const schema=z.object({name:z.string().min(2).max(80),slug:z.string().regex(/^[a-z0-9-]+$/).max(100),description:z.string().max(2000).default(""),priceMinor:z.number().int().positive(),type:z.enum(["RANK","POINTS","ITEM"]),pointsAmount:z.number().int().positive().optional(),rankKey:z.string().max(40).optional(),enabled:z.boolean().default(true),deliveryCommands:z.array(z.string().max(300)).max(20).default([])});
+const schema=z.object({name:z.string().min(2).max(80),slug:z.string().regex(/^[a-z0-9-]+$/).max(100),description:z.string().max(2000).default(""),priceMinor:z.number().int().positive(),type:z.enum(["RANK","POINTS","ITEM"]),pointsAmount:z.number().int().positive().optional(),rankKey:z.string().max(40).optional(),enabled:z.boolean().default(true),deliveryCommands:z.array(z.string().max(300)).max(20).default([]),benefits:z.array(z.string().max(200)).max(30).default([])});
 export async function POST(request:Request){
  const auth=await requireRoles(["OWNER","ADMIN"]);if(auth.response)return auth.response;
  try{
