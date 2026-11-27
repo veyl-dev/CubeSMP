@@ -1,0 +1,11 @@
+website:
+  url: "https://yourdomain.com"
+  api-key: "CHANGE_ME"
+
+delivery:
+  check-interval: 5
+  retry-attempts: 3
+  request-timeout-seconds: 10
+
+logging:
+  enabled: true
