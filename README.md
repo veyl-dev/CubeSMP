@@ -1,11 +1,11 @@
 # CubeSMP
 
-CubeSMP is a Minecraft server storefront and management platform with a Next.js web application, PostgreSQL database, manual GCash/Maya verification, and a separate Paper plugin named CubeSMP Bridge.
+CubeSMP is a Minecraft server storefront and management platform with a Next.js web application, Supabase PostgreSQL and Storage, manual GCash/Maya verification, and a separate Paper plugin named CubeSMP Bridge.
 
 ## Repository layout
 
 - `apps/web` — Next.js storefront, player accounts, admin screens, API routes.
-- `apps/web/prisma` — PostgreSQL Prisma schema and initial product seed.
+- `apps/web/prisma` — PostgreSQL Prisma schema, migrations, and product seed.
 - `apps/bridge` — Paper plugin that polls approved delivery jobs.
 - `docs` — architecture, setup, operations, and security notes.
 
@@ -13,24 +13,22 @@ CubeSMP is a Minecraft server storefront and management platform with a Next.js 
 
 - Node.js 22+
 - pnpm 10+
-- PostgreSQL 15+
+- Supabase project (PostgreSQL and Storage)
 - Java 21 and Maven 3.9+
-- S3-compatible private object storage for payment proofs
 
 ## Local setup
 
-1. Copy `.env.example` to `apps/web/.env` (or provide variables in the web app runtime).
-2. Set `DATABASE_URL` to a PostgreSQL database.
+1. Copy `apps/web/.env.example` to `apps/web/.env` (or provide the variables in your web runtime).
+2. Fill in `SUPABASE_URL`, the server-only `SUPABASE_SECRET_KEY`, `DATABASE_URL`, and `DIRECT_URL` from your CubeSMP Supabase project.
 3. Generate long random `SESSION_SECRET` and `BRIDGE_SHARED_SECRET` values.
-4. Configure private S3 storage values.
-5. Install dependencies from the repository root: `pnpm install`.
-6. Generate Prisma Client: `pnpm --filter @cubesmp/web db:generate`.
-7. Apply the schema in development: `pnpm --filter @cubesmp/web db:migrate`.
-8. Seed the editable catalog: `pnpm --filter @cubesmp/web db:seed`.
-9. Create the first Owner using the one-time bootstrap variables and command described in [deployment](docs/DEPLOYMENT.md).
-10. Start the website: `pnpm dev`.
+4. Install dependencies from the repository root: `pnpm install`.
+5. Generate Prisma Client: `pnpm --filter @cubesmp/web db:generate`.
+6. For the already-provisioned CubeSMP Supabase project, baseline Prisma migration history as described in [deployment](docs/DEPLOYMENT.md). Do not rerun the initial schema SQL against the populated project.
+7. Seed the editable catalog: `pnpm --filter @cubesmp/web db:seed`.
+8. Create the first Owner using the one-time bootstrap variables and command described in [deployment](docs/DEPLOYMENT.md).
+9. Start the website: `pnpm dev`.
 
-The starter catalog includes VIP, MVP, ELITE and 1,000 / 3,000 / 5,000 / 10,000 point packages with sample PHP prices. Change them in Admin → Store before launch. GCash and Maya stay disabled until configured by the Owner.
+The starter catalog includes VIP, MVP, ELITE and 1,000 / 3,000 / 5,000 / 10,000 point packages with sample PHP prices. Change them in Admin → Store before launch. GCash and Maya remain disabled until the Owner configures real payment details.
 
 ## Build the Bridge plugin
 
