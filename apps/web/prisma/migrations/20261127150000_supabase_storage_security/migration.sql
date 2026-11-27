@@ -14,9 +14,13 @@ ALTER TABLE "Announcement" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "PaymentMethodSetting" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "AuditLog" ENABLE ROW LEVEL SECURITY;
 
-REVOKE ALL ON TABLE "User","Session","ProductCategory","Product","Order","OrderItem",
-"PaymentTransaction","PointLedger","DeliveryJob","DeliveryLog","WebsiteSetting",
-"Announcement","PaymentMethodSetting","AuditLog" FROM anon, authenticated;
+DO $grants$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname='anon') AND EXISTS (SELECT 1 FROM pg_roles WHERE rolname='authenticated') THEN
+    EXECUTE 'REVOKE ALL ON TABLE "User","Session","ProductCategory","Product","Order","OrderItem","PaymentTransaction","PointLedger","DeliveryJob","DeliveryLog","WebsiteSetting","Announcement","PaymentMethodSetting","AuditLog" FROM anon, authenticated';
+  END IF;
+END
+$grants$;
 
 -- Storage is provided by Supabase. Skip this block on the plain PostgreSQL service used by CI.
 DO $storage$
