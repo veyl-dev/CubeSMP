@@ -16,6 +16,9 @@ jobs:
         with:
           node-version: 22
       - run: pnpm install --no-frozen-lockfile
+      - run: pnpm --filter @cubesmp/web exec prisma validate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/cubesmp
       - run: pnpm --filter @cubesmp/web db:generate
       - run: pnpm --filter @cubesmp/web typecheck
         env:
