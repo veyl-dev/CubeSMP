@@ -8,6 +8,7 @@ export async function POST(request:Request){
  const auth=await requireRoles(["OWNER","ADMIN"]);if(auth.response)return auth.response;
  try{
   const data=schema.parse(await request.json());
+  if(data.enabled&&(data.priceMinor<=0||data.deliveryCommands.length===0))return NextResponse.json({error:"Enabled products need a positive price and at least one delivery command"},{status:400});
   const product=await prisma.product.create({data});
   await prisma.auditLog.create({data:{actorId:auth.user!.id,action:"PRODUCT_CREATED",entityType:"Product",entityId:product.id}});
   return NextResponse.json({product},{status:201});
