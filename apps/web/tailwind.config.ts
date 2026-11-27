@@ -15,7 +15,7 @@ const config: Config = {
         glow: "0 0 42px rgba(0, 140, 255, .16)"
       },
       backgroundImage: {
-        "brand-gradient": "linear-gradient(115deg, #42d9ff 0%, #078cff 52%, #0755ed 100%)"
+        "brand-gradient": "linear-gradient(115deg, var(--brand-cyan, #42d9ff) 0%, var(--brand-primary, #078cff) 52%, var(--brand-accent, #0755ed) 100%)"
       }
     }
   },
