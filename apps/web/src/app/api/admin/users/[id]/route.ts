@@ -13,6 +13,7 @@ export async function PATCH(request:Request,context:{params:Promise<{id:string}>
   if(!target)return NextResponse.json({error:"Player not found"},{status:404});
   if(auth.user!.role!=="OWNER"&&(input.role==="OWNER"||target.role==="OWNER"||input.role==="ADMIN"))return NextResponse.json({error:"Only the Owner can manage administrator roles"},{status:403});
   if(input.role==="OWNER"&&auth.user!.role!=="OWNER")return NextResponse.json({error:"Owner permission required"},{status:403});
+  if(input.pointsDelta!==undefined&&target.pointsBalance+input.pointsDelta<0)return NextResponse.json({error:"Points balance cannot be negative"},{status:400});
   const result=await prisma.$transaction(async tx=>{
    const user=await tx.user.update({where:{id},data:{...(input.role?{role:input.role}:{}),...(input.suspended!==undefined?{suspended:input.suspended}:{}),...(input.pointsDelta!==undefined?{pointsBalance:{increment:input.pointsDelta}}:{})}});
    if(input.pointsDelta!==undefined&&input.pointsDelta!==0)await tx.pointLedger.create({data:{userId:id,delta:input.pointsDelta,reason:"Administrator adjustment",actorId:auth.user!.id}});
