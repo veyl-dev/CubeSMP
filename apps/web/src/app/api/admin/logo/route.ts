@@ -19,5 +19,5 @@ export async function POST(request:Request){
   await prisma.websiteSetting.upsert({where:{key:"logo_key"},create:{key:"logo_key",value:key},update:{value:key}});
   await prisma.auditLog.create({data:{actorId:auth.user!.id,action:"SITE_LOGO_UPDATED",entityType:"WebsiteSetting",entityId:"logo_key"}});
   return NextResponse.json({key});
- }catch{return NextResponse.json({error:"Logo upload failed. Check private storage configuration."},{status:503});}
+ }catch{return NextResponse.json({error:"Logo upload failed. Check Supabase Storage configuration."},{status:503});}
 }
