@@ -17,8 +17,10 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       const job = await tx.deliveryJob.findUnique({ where: { id }, include: { order: { include: { user: true, items: { include: { product: true } } } } } });
       if (!job) throw new Error("NOT_FOUND");
       if (job.status !== "CLAIMED") throw new Error("NOT_CLAIMED");
-      await tx.deliveryJob.update({ where: { id }, data: { status: input.success ? "SUCCEEDED" : "QUEUED", lastError: input.success ? null : (input.detail ?? "Delivery failed") } });
-      await tx.deliveryLog.create({ data: { jobId: id, event: input.success ? "SUCCEEDED" : "FAILED", detail: input.detail } });
+      const retryLimit = Math.max(1, Number(process.env.BRIDGE_MAX_ATTEMPTS ?? 3));
+      const nextStatus = input.success ? "SUCCEEDED" : (job.attempts >= retryLimit ? "FAILED" : "QUEUED");
+      await tx.deliveryJob.update({ where: { id }, data: { status: nextStatus, lastError: input.success ? null : (input.detail ?? "Delivery failed") } });
+      await tx.deliveryLog.create({ data: { jobId: id, event: nextStatus, detail: input.detail } });
       if (input.success) {
         await tx.order.update({ where: { id: job.orderId }, data: { status: "DELIVERED" } });
         await tx.paymentTransaction.updateMany({ where: { orderId: job.orderId, status: "APPROVED" }, data: { status: "DELIVERED" } });
