@@ -8,15 +8,28 @@
 - [ ] Configure reverse-proxy rate limiting for login, registration, proof upload, and checkout endpoints.
 - [ ] Configure Supabase Storage lifecycle and retention for payment evidence.
 - [ ] Configure a malware scanning process and access policy for payment proofs.
-- [ ] Set product prices, rank benefits, and delivery commands; keep products disabled until verified.
+- [ ] Review sample product prices, rank benefits, and delivery commands.
 - [ ] Verify GCash/Maya details with the account owner.
 - [ ] Test all delivery commands on staging and validate installed plugin command names.
 - [ ] Restrict Paper server outbound access to the website and protect plugin config backups.
 - [ ] Test failed delivery, server outage, API timeout, and manual recovery procedures.
 
-## Supabase setup\n\n- Set `SUPABASE_URL` to the CubeSMP Supabase project URL and `SUPABASE_SECRET_KEY` to a server-only project secret key. Never expose the secret key with a `NEXT_PUBLIC_` prefix.\n- Set `DATABASE_URL` to the Supabase pooler connection string for application runtime and `DIRECT_URL` to the direct PostgreSQL connection string for Prisma migrations. Use the database password from the Supabase project setup; it is not retrievable through this connection.\n- Copy `apps/web/.env.example` and fill in the database password, Supabase server secret key, and application secrets.\n- The existing CubeSMP tables were provisioned directly in Supabase. On the first deployment only, baseline Prisma history without rerunning the already-applied SQL: `pnpm --filter @cubesmp/web exec prisma migrate resolve --applied 20261127000000_init`, then repeat for `20261127150000_supabase_storage_security` and `20261127160000_supabase_index_and_function_hardening`. After baselining, use `pnpm --filter @cubesmp/web db:deploy` for future migrations.\n- Buckets `payment-proofs` (private), `product-images` (public), and `site-assets` (public) are provisioned by the Supabase migration.\n- The application tables have RLS enabled and direct Data API grants revoked; Next.js accesses them through its server-side Prisma database connection.\n\n## Initial catalog\n\nThe Supabase project has seven enabled starter products with editable PHP prices: VIP ₱149, MVP ₱299, ELITE ₱499, Starter 1,000 points ₱49, Standard 3,000 points ₱129, Advanced 5,000 points ₱199, and Premium 10,000 points ₱349. These are sample prices only; change them in Admin → Store before launch. GCash and Maya payment methods remain disabled until the Owner configures real payment details.\n\n## Payment review
+## Supabase setup
 
-Uploaded screenshots are evidence only. They are never automatically approved. Only Owner/Admin roles can approve or reject. The review endpoint uses a database transaction and changes only a PENDING payment; an approved payment creates one delivery job under a unique order constraint. Review actions are written to the audit log.
+- Set `SUPABASE_URL` to the CubeSMP project URL and `SUPABASE_SECRET_KEY` to a server-only project secret key. Never expose the secret key with a `NEXT_PUBLIC_` prefix.
+- Set `DATABASE_URL` to the Supabase pooler connection string for application runtime and `DIRECT_URL` to the direct PostgreSQL connection string for Prisma migrations.
+- Copy `apps/web/.env.example` and fill in the database password, Supabase server secret key, and application secrets.
+- The existing CubeSMP tables were provisioned directly in Supabase. On first deployment only, baseline Prisma history without rerunning the already-applied SQL using the three `prisma migrate resolve --applied` commands in [DEPLOYMENT.md](DEPLOYMENT.md).
+- Buckets `payment-proofs` (private), `product-images` (public), and `site-assets` (public) are provisioned.
+- Application tables have RLS enabled and direct Data API grants revoked. Next.js accesses them through its server-side Prisma database connection. No browser client receives direct access to the application tables.
+
+## Initial catalog
+
+The Supabase project has seven enabled starter products with editable PHP prices: VIP ₱149, MVP ₱299, ELITE ₱499, Starter 1,000 points ₱49, Standard 3,000 points ₱129, Advanced 5,000 points ₱199, and Premium 10,000 points ₱349. These are sample prices only; change them in Admin → Store before launch. GCash and Maya payment methods remain disabled until the Owner configures real payment details.
+
+## Payment review
+
+Uploaded screenshots are evidence only. They are never automatically approved. Only Owner/Admin roles can approve or reject. The review endpoint changes only a PENDING payment; an approved payment creates one delivery job under a unique order constraint. Review actions are written to the audit log.
 
 Payment proof objects are uploaded server-side to the private Supabase Storage `payment-proofs` bucket after validating JPEG, PNG, or WebP file signatures and a 5 MB size limit. They are stored under a per-user private object key. Admin proof links are short-lived signed URLs. Product images and site assets use public Supabase Storage buckets. The Supabase server secret key is required only on the server and must never be exposed to browser code.
 
