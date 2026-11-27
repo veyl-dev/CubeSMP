@@ -141,7 +141,7 @@ model PaymentTransaction {
   order             Order @relation(fields: [orderId], references: [id])
   reviewer          User? @relation("PaymentReviewer", fields: [reviewedById], references: [id])
   @@index([status, createdAt])
-  @@index([referenceNumber])
+  @@unique([method, referenceNumber])
 }
 
 model PointLedger {
