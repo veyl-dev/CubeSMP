@@ -14,10 +14,10 @@ The current repository had no application code or framework to preserve. This do
 
 - Next.js App Router with server components by default.
 - TypeScript and Tailwind CSS for the responsive blue/black interface.
-- PostgreSQL as the source of truth; Prisma for schema, migrations, and typed queries.
+- Supabase-hosted PostgreSQL as the source of truth; Prisma for schema, migrations, and typed queries. Supabase Storage holds private payment proofs and public product/site assets.
 - Server-side session authentication with securely hashed passwords.
 - Role-based authorization enforced in server actions/API handlers, not only in the UI.
-- Private object storage for payment proofs; never expose storage credentials or public proof URLs.
+- Supabase Storage: private `payment-proofs` bucket and public read-only `product-images` / `site-assets` buckets. Uploads and signed proof URLs are created only on the server; never expose the Supabase secret key.
 - Product prices, rank benefits, payment instructions, and homepage content are database-managed.
 
 ## Core domain model
@@ -63,7 +63,7 @@ Every privileged operation is authorized on the server and recorded in the audit
 
 ## Environments and deployment
 
-Local development uses environment variables documented in `.env.example`. Production requires HTTPS, a managed PostgreSQL database, private object storage, secure session settings, backups, and a separately configured Paper server.
+Local development uses environment variables documented in `apps/web/.env.example`. Production requires HTTPS, the CubeSMP Supabase project, server-only Supabase secret key, pooled and direct PostgreSQL connection strings, secure session settings, backups, and a separately configured Paper server.
 
 No real GCash/Maya gateway integration is assumed. The first release uses manual payment instructions and human verification only.
 
@@ -80,4 +80,4 @@ No real GCash/Maya gateway integration is assumed. The first release uses manual
 
 ## Current status
 
-Architecture only. No storefront, authentication, payment processing, database migrations, or plugin functionality is claimed to be implemented yet.
+Implemented foundation: responsive Next.js storefront, authentication, admin and player areas, manual payment verification, Supabase PostgreSQL/Storage integration, and Paper Bridge. Remaining production controls and delivery limitations are listed in `docs/OPERATIONS.md`.
