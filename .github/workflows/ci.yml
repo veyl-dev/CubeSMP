@@ -7,6 +7,23 @@ on:
 jobs:
   web:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: cubesmp
+          POSTGRES_PASSWORD: cubesmp_local_only
+          POSTGRES_DB: cubesmp
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U cubesmp -d cubesmp"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://cubesmp:cubesmp_local_only@localhost:5432/cubesmp?schema=public
+      SESSION_SECRET: test-only-session-secret-change-this-before-production
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -17,17 +34,11 @@ jobs:
           node-version: 22
       - run: pnpm install --no-frozen-lockfile
       - run: pnpm --filter @cubesmp/web exec prisma validate
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/cubesmp
       - run: pnpm --filter @cubesmp/web db:generate
+      - run: pnpm --filter @cubesmp/web db:deploy
+      - run: pnpm --filter @cubesmp/web db:seed
       - run: pnpm --filter @cubesmp/web typecheck
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/cubesmp
-          SESSION_SECRET: test-only-session-secret-change-this-before-production
       - run: pnpm --filter @cubesmp/web build
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/cubesmp
-          SESSION_SECRET: test-only-session-secret-change-this-before-production
   bridge:
     runs-on: ubuntu-latest
     steps:
