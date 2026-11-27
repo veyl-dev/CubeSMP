@@ -21,6 +21,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       const payment = await tx.paymentTransaction.findUnique({ where: { id }, include: { order: true } });
       if (!payment) throw new Error("NOT_FOUND");
       if (payment.status !== "PENDING") throw new Error("ALREADY_REVIEWED");
+      if (payment.order.userId === auth.user!.id) throw new Error("SELF_REVIEW");
       const updated = await tx.paymentTransaction.updateMany({
         where: { id, status: "PENDING" },
         data: {
@@ -45,6 +46,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     const message = error instanceof Error ? error.message : "";
     if (message === "NOT_FOUND") return NextResponse.json({ error: "Payment not found" }, { status: 404 });
     if (message === "ALREADY_REVIEWED") return NextResponse.json({ error: "Payment has already been reviewed" }, { status: 409 });
+    if (message === "SELF_REVIEW") return NextResponse.json({ error: "You cannot review your own payment" }, { status: 403 });
     return NextResponse.json({ error: "Unable to review payment" }, { status: 500 });
   }
 }
