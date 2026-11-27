@@ -21,6 +21,7 @@ export async function PATCH(request:Request,context:{params:Promise<{id:string}>
  const {id}=await context.params;
  try{
   const data=schema.parse(await request.json());
+  if(data.enabled){const current=await prisma.product.findUnique({where:{id}});const price=data.priceMinor??current?.priceMinor??0;const commands=data.deliveryCommands??(Array.isArray(current?.deliveryCommands)?current.deliveryCommands.filter((v):v is string=>typeof v==="string"):[]);if(price<=0||commands.length===0)return NextResponse.json({error:"Enabled products need a positive price and at least one delivery command"},{status:400});}
   const product=await prisma.product.update({where:{id},data});
   await prisma.auditLog.create({data:{actorId:auth.user!.id,action:"PRODUCT_UPDATED",entityType:"Product",entityId:id}});
   return NextResponse.json({product});
