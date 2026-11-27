@@ -3,7 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireRoles } from "@/lib/authz";
 
-const schema=z.object({method:z.enum(["GCASH","MAYA"]),accountName:z.string().min(2).max(100),accountNumber:z.string().min(5).max(40),instructions:z.string().max(1000),enabled:z.boolean()});
+const schema=z.object({method:z.enum(["GCASH","MAYA"]),accountName:z.string().min(2).max(100),accountNumber:z.string().min(5).max(40),instructions:z.string().max(1000),enabled:z.boolean(),qrObjectKey:z.string().startsWith("payment-qr/").nullable().optional()});
 export async function GET(){
  const auth=await requireRoles(["OWNER","ADMIN"]);if(auth.response)return auth.response;
  if(auth.user!.role!=="OWNER")return NextResponse.json({error:"Owner permission required"},{status:403});
