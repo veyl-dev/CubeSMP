@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-const fields=[["site_name","Website name"],["homepage_title","Homepage title"],["homepage_description","Homepage description"],["server_ip","Server IP"],["server_information","Server information"],["footer_text","Footer text"]];
+const fields=[["site_name","Website name"],["homepage_title","Homepage title"],["homepage_description","Homepage description"],["server_ip","Server IP"],["server_information","Server information"],["footer_text","Footer text"],["support_email","Support email"],["discord_url","Discord invite URL"]];
 export default function ContentEditor({initial}:{initial:Record<string,string>}){
  const [values,setValues]=useState(initial);const [message,setMessage]=useState("");
  async function save(key:string){const r=await fetch("/api/admin/settings",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({key,value:values[key]??""})});const d=await r.json();setMessage(r.ok?key+" saved":d.error??"Save failed");}
