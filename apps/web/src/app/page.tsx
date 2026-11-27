@@ -14,7 +14,7 @@ export default async function Home() {
   const [rawProducts,ipSetting,contentSettings,announcements] = await Promise.all([
     prisma.product.findMany({where:{enabled:true},orderBy:[{featured:"desc"},{createdAt:"desc"}]}),
     prisma.websiteSetting.findUnique({where:{key:"server_ip"}}),
-    prisma.websiteSetting.findMany({where:{key:{in:["homepage_title","homepage_description","facebook_url","instagram_url","youtube_url","tiktok_url","footer_text","site_name"]}}}),
+    prisma.websiteSetting.findMany({where:{key:{in:["homepage_title","homepage_description","facebook_url","instagram_url","youtube_url","tiktok_url","footer_text","site_name","nav_home_label","nav_store_label","nav_ranks_label","nav_support_label","nav_store_url"]}}}),
     prisma.announcement.findMany({where:{published:true},orderBy:{publishedAt:"desc"},take:3})
   ]);
   const products=await Promise.all(rawProducts.map(async p=>({...p,imageUrl:p.imageUrl?await createDownloadUrl(p.imageUrl).catch(()=>null):null})));
@@ -25,6 +25,11 @@ export default async function Home() {
   const content=Object.fromEntries(contentSettings.map(s=>[s.key,s.value]));
   const heroTitle=typeof content.homepage_title==="string"?content.homepage_title:"MAKE YOUR MARK.";
   const heroDescription=typeof content.homepage_description==="string"?content.homepage_description:"Gear up, stand out, and make every moment count. Explore the official CubeSMP store for ranks, points, and server upgrades.";
+  const navHome=typeof content.nav_home_label==="string"?content.nav_home_label:"Home";
+  const navStore=typeof content.nav_store_label==="string"?content.nav_store_label:"Store";
+  const navRanks=typeof content.nav_ranks_label==="string"?content.nav_ranks_label:"Ranks";
+  const navSupport=typeof content.nav_support_label==="string"?content.nav_support_label:"Support";
+  const navStoreUrl=typeof content.nav_store_url==="string"&&content.nav_store_url.startsWith("/")?content.nav_store_url:"/store";
   return <main className="min-h-screen overflow-hidden">
     <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_50%_-20%,rgba(0,132,255,.17),transparent_55%)]"/>
     <header className="sticky top-0 z-30 border-b border-white/[.07] bg-ink/85 backdrop-blur-xl"><nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4"><Logo/><div className="hidden items-center gap-8 text-sm font-semibold text-slate-400 md:flex"><Link className="text-white" href="/">Home</Link><Link className="hover:text-white" href="/store">Store</Link><a className="hover:text-white" href="#ranks">Ranks</a><a className="hover:text-white" href="#how">How to buy</a></div><div className="flex items-center gap-3"><Link href="/login" className="hidden text-sm font-bold text-slate-300 hover:text-white sm:block">Log in</Link><Link href="/register" className="rounded-xl border border-sky-400/30 bg-sky-400/10 px-4 py-2.5 text-sm font-extrabold text-sky-300 hover:bg-sky-400/20">My account <ArrowUpRight size={15} className="ml-1 inline"/></Link></div></nav></header>
