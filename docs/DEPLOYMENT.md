@@ -25,7 +25,7 @@ From the repository root:
 ```bash
 pnpm install
 pnpm --filter @cubesmp/web db:generate
-pnpm --filter @cubesmp/web db:migrate -- --name init
+pnpm --filter @cubesmp/web db:deploy
 pnpm --filter @cubesmp/web db:seed
 ```
 
