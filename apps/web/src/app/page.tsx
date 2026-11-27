@@ -7,7 +7,7 @@ import CopyIp from "@/components/copy-ip";
 export const dynamic = "force-dynamic";
 
 function Logo() {
-  return <Link href="/" className="flex items-center gap-3 font-black tracking-tight"><img src="/cubesmp-logo.svg" alt="CubeSMP" className="h-10 w-10"/><span className="text-xl">CUBE<span className="text-sky-400">SMP</span></span></Link>;
+  return <Link href="/" className="flex items-center gap-3 font-black tracking-tight"><img src="/api/branding/logo" alt="CubeSMP" className="h-10 w-10"/><span className="text-xl">CUBE<span className="text-sky-400">SMP</span></span></Link>;
 }
 const rankIcons = [Shield,Crown,Gem];
 export default async function Home() {
