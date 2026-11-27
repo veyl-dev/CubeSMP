@@ -14,7 +14,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   try { input = schema.parse(await request.json()); } catch { return NextResponse.json({ error: "Invalid result" }, { status: 400 }); }
   try {
     await prisma.$transaction(async tx => {
-      const job = await tx.deliveryJob.findUnique({ where: { id } });
+      const job = await tx.deliveryJob.findUnique({ where: { id }, include: { order: { include: { user: true, items: { include: { product: true } } } } } });
       if (!job) throw new Error("NOT_FOUND");
       if (job.status !== "CLAIMED") throw new Error("NOT_CLAIMED");
       await tx.deliveryJob.update({ where: { id }, data: { status: input.success ? "SUCCEEDED" : "QUEUED", lastError: input.success ? null : (input.detail ?? "Delivery failed") } });
@@ -22,6 +22,11 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       if (input.success) {
         await tx.order.update({ where: { id: job.orderId }, data: { status: "DELIVERED" } });
         await tx.paymentTransaction.updateMany({ where: { orderId: job.orderId, status: "APPROVED" }, data: { status: "DELIVERED" } });
+        const points = job.order.items.reduce((sum, item) => sum + (item.product.type === "POINTS" ? (item.product.pointsAmount ?? 0) * item.quantity : 0), 0);
+        if (points > 0) {
+          await tx.user.update({ where: { id: job.order.userId }, data: { pointsBalance: { increment: points } } });
+          await tx.pointLedger.create({ data: { userId: job.order.userId, delta: points, reason: "Store purchase delivery", referenceId: job.id } });
+        }
       }
     });
     return NextResponse.json({ ok: true });
