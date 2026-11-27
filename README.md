@@ -25,7 +25,7 @@ CubeSMP is a Minecraft server storefront and management platform with a Next.js 
 4. Configure private S3 storage values.
 5. Install dependencies from the repository root: `pnpm install`.
 6. Generate Prisma Client: `pnpm --filter @cubesmp/web db:generate`.
-7. Apply the schema in development: `pnpm --filter @cubesmp/web db:migrate -- --name init`.
+7. Apply the schema in development: `pnpm --filter @cubesmp/web db:migrate`.
 8. Seed the initial disabled catalog: `pnpm --filter @cubesmp/web db:seed`.
 9. Create the first Owner using the one-time bootstrap variables and command described in [deployment](docs/DEPLOYMENT.md).
 10. Start the website: `pnpm dev`.
