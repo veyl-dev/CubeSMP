@@ -1,0 +1,38 @@
+name: CubeSMP CI
+on:
+  push:
+    branches: [main, "feat/**"]
+  pull_request:
+    branches: [main]
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm --filter @cubesmp/web db:generate
+      - run: pnpm --filter @cubesmp/web typecheck
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/cubesmp
+          SESSION_SECRET: test-only-session-secret-change-this-before-production
+      - run: pnpm --filter @cubesmp/web build
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/cubesmp
+          SESSION_SECRET: test-only-session-secret-change-this-before-production
+  bridge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - run: mvn -B -f apps/bridge/pom.xml package
