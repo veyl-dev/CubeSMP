@@ -10,8 +10,10 @@ export default function LoginPage() {
   async function submit(event:FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError(""); setBusy(true);
     const form=new FormData(event.currentTarget);
-    const response=await fetch("/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:form.get("email"),password:form.get("password")})});
-    const data=await response.json(); setBusy(false);
+    let response: Response;
+    try { response=await fetch("/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:form.get("email"),password:form.get("password")})}); }
+    catch { setBusy(false); setError("Could not reach the server. Please try again."); return; }
+    const data=await response.json().catch(()=>({error:"The server returned an invalid response"})); setBusy(false);
     if(!response.ok){setError(data.error??"Login failed");return;}
     router.push(data.user.role==="OWNER"||data.user.role==="ADMIN"||data.user.role==="MODERATOR"?"/admin":"/dashboard"); router.refresh();
   }

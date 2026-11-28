@@ -11,8 +11,10 @@ export default function RegisterPage() {
     event.preventDefault(); setError(""); setBusy(true);
     const form=new FormData(event.currentTarget);
     if(form.get("password")!==form.get("confirmPassword")){setBusy(false);setError("Passwords do not match");return;}
-    const response=await fetch("/api/auth/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:form.get("email"),minecraftName:form.get("minecraftName"),password:form.get("password")})});
-    const data=await response.json(); setBusy(false);
+    let response: Response;
+    try { response=await fetch("/api/auth/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:form.get("email"),minecraftName:form.get("minecraftName"),password:form.get("password")})}); }
+    catch { setBusy(false); setError("Could not reach the server. Please try again."); return; }
+    const data=await response.json().catch(()=>({error:"The server returned an invalid response"})); setBusy(false);
     if(!response.ok){setError(data.error??"Registration failed");return;}
     router.push("/dashboard"); router.refresh();
   }

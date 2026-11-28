@@ -3,11 +3,12 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
 const COOKIE = "cubesmp_session";
-const secret = () => {
+export function assertSessionSecret() {
   const value = process.env.SESSION_SECRET;
   if (!value || value.length < 32) throw new Error("SESSION_SECRET must contain at least 32 characters");
   return value;
-};
+}
+const secret = assertSessionSecret;
 const sign = (id: string) => createHmac("sha256", secret()).update(id).digest("hex");
 export async function createSession(userId: string) {
   const id = randomBytes(32).toString("hex");
